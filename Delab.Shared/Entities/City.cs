@@ -5,9 +5,9 @@ namespace Delab.Shared.Entities;
 public class City
 {
     [Key]
-    public int IdCity { get; set; }
+    public int CityId { get; set; }
 
-    public int IdState { get; set; }
+    public int StateId { get; set; }
 
     [Required(ErrorMessage = "El campo {0} es obligatorio")]
     [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]

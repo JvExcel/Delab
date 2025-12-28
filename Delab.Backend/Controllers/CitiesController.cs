@@ -1,33 +1,29 @@
 ﻿using Delab.AccesData.Data;
 using Delab.Shared.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using Microsoft.EntityFrameworkCore.Query;
 
 namespace Delab.Backend.Controllers;
 
-[Route("api/countries")]
+[Route("api/Cities")]
 [ApiController]
-public class CountriesController : ControllerBase
+public class CitiesController : ControllerBase
 {
     private readonly DataContext _context;
 
-    public CountriesController(DataContext context)
+    public CitiesController(DataContext context)
     {
         _context = context;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Country>>> GetCountries()
+    public async Task<ActionResult<IEnumerable<City>>> GetListAsync()
     {
         try
         {
-            var listCountries = await _context.Countries
-                .Include(X => X.States)! // Señalamiento para incluir su realcion mas cercana
-                .ThenInclude(x=> x.Cities) // Señalar que debe ingresar mas adentro de la jerarquia, llegando a Stites => Cities
-                .OrderBy(x => x.Name).ToListAsync();
-            return Ok(listCountries);
+            var listItems = await _context.Cities.OrderBy(x => x.Name).ToListAsync();
+            return Ok(listItems);
         }
         catch (Exception ex)
         {
@@ -36,18 +32,14 @@ public class CountriesController : ControllerBase
     }
 
     [HttpGet("{Id}")]
-    public async Task<ActionResult<Country>> GetCountry(int Id)
+    public async Task<ActionResult<City>> GetAsync(int Id)
     {
         try
         {
             // Caasos de Uso donde se puede buscar un objeto de diferentes formas
             // 1
-            var Country = await _context.Countries.FindAsync(Id);
-            //// 2
-            //var IdCountry = await _context.Countries.Where(x => x.IdCountry == Id).FirstOrDefaultAsync();
-            //// 3
-            //var IdCountry2 = await _context.Countries.FirstOrDefaultAsync(x => x.IdCountry == Id);
-            return Ok(Country);
+            var Item = await _context.Cities.FindAsync(Id);
+            return Ok(Item);
         }
         catch (Exception ex)
         {
@@ -56,11 +48,11 @@ public class CountriesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> PostCountry([FromBody] Country modelo)
+    public async Task<IActionResult> PostAsync([FromBody] City modelo)
     {
         try
         {
-            _context.Countries.Add(modelo);
+            _context.Cities.Add(modelo);
             await _context.SaveChangesAsync();
             return Ok();
         }
@@ -82,27 +74,27 @@ public class CountriesController : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<Country>> PutCountry(Country modelo)
+    public async Task<ActionResult<City>> PutAsync(City modelo)
     {
         try
         {
             // Primero Buscamos el Objeto
-            var Updatecountry = await _context.Countries.FirstOrDefaultAsync(x => x.CountryId == modelo.CountryId);
+            var Update = await _context.Cities.FirstOrDefaultAsync(x => x.CityId == modelo.CityId);
 
             // Actualizamos la informacion que necesitamos
-            Updatecountry!.Name = modelo.Name;
-            Updatecountry.CodPhone = modelo.CodPhone;
+            Update!.Name = modelo.Name;
+            Update.StateId = modelo.StateId;
 
             // Indico que hay que actualizar
-            _context.Countries.Update(Updatecountry);
+            _context.Cities.Update(Update);
 
             // Guardo los Cambios
             await _context.SaveChangesAsync();
 
             // Retorno el Objeto Completo
-            return Ok(Updatecountry);
+            return Ok(Update);
         }
-        catch(DbUpdateException dbEx)
+        catch (DbUpdateException dbEx)
         {
             if (dbEx.InnerException!.Message.Contains("duplicate"))
             {
@@ -120,21 +112,21 @@ public class CountriesController : ControllerBase
     }
 
     [HttpDelete("{Id}")]
-    public async Task<IActionResult> DeleteCountry(int Id)
+    public async Task<IActionResult> DeleteAsync(int Id)
     {
         try
         {
             // Buscar el Registro
-            var DeleteCountry = await _context.Countries.FindAsync(Id);
+            var DeleteItem = await _context.Cities.FindAsync(Id);
 
             // Validar si encontro algo o no
-            if (DeleteCountry == null)
+            if (DeleteItem == null)
             {
                 return BadRequest("No se encontro esa Monda");
             }
 
             // Eliminar
-            _context.Countries.Remove(DeleteCountry);
+            _context.Cities.Remove(DeleteItem);
 
             // guardar Cambio
             await _context.SaveChangesAsync();
@@ -159,5 +151,4 @@ public class CountriesController : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-
 }

@@ -5,7 +5,7 @@
 namespace Delab.Backend.Migrations
 {
     /// <inheritdoc />
-    public partial class CountryStateCityDB : Migration
+    public partial class InitialDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -14,34 +14,33 @@ namespace Delab.Backend.Migrations
                 name: "Countries",
                 columns: table => new
                 {
-                    IdCountry = table.Column<int>(type: "int", nullable: false)
+                    CountryId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CodPhone = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Countries", x => x.IdCountry);
+                    table.PrimaryKey("PK_Countries", x => x.CountryId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "States",
                 columns: table => new
                 {
-                    IdState = table.Column<int>(type: "int", nullable: false)
+                    StateId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdCountry = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CountryIdCountry = table.Column<int>(type: "int", nullable: true)
+                    CountryId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_States", x => x.IdState);
+                    table.PrimaryKey("PK_States", x => x.StateId);
                     table.ForeignKey(
-                        name: "FK_States_Countries_CountryIdCountry",
-                        column: x => x.CountryIdCountry,
+                        name: "FK_States_Countries_CountryId",
+                        column: x => x.CountryId,
                         principalTable: "Countries",
-                        principalColumn: "IdCountry",
+                        principalColumn: "CountryId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -49,33 +48,32 @@ namespace Delab.Backend.Migrations
                 name: "Cities",
                 columns: table => new
                 {
-                    IdCity = table.Column<int>(type: "int", nullable: false)
+                    CityId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdState = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    StateIdState = table.Column<int>(type: "int", nullable: true)
+                    StateId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cities", x => x.IdCity);
+                    table.PrimaryKey("PK_Cities", x => x.CityId);
                     table.ForeignKey(
-                        name: "FK_Cities_States_StateIdState",
-                        column: x => x.StateIdState,
+                        name: "FK_Cities_States_StateId",
+                        column: x => x.StateId,
                         principalTable: "States",
-                        principalColumn: "IdState",
+                        principalColumn: "StateId",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_Name_IdState",
+                name: "IX_Cities_Name_StateId",
                 table: "Cities",
-                columns: new[] { "Name", "IdState" },
+                columns: new[] { "Name", "StateId" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Cities_StateIdState",
+                name: "IX_Cities_StateId",
                 table: "Cities",
-                column: "StateIdState");
+                column: "StateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Countries_Name",
@@ -84,14 +82,14 @@ namespace Delab.Backend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_States_CountryIdCountry",
+                name: "IX_States_CountryId",
                 table: "States",
-                column: "CountryIdCountry");
+                column: "CountryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_States_Name_IdCountry",
+                name: "IX_States_Name_CountryId",
                 table: "States",
-                columns: new[] { "Name", "IdCountry" },
+                columns: new[] { "Name", "CountryId" },
                 unique: true);
         }
 

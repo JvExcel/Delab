@@ -23,28 +23,25 @@ namespace Delab.Backend.Migrations
 
             modelBuilder.Entity("Delab.Shared.Entities.City", b =>
                 {
-                    b.Property<int>("IdCity")
+                    b.Property<int>("CityId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCity"));
-
-                    b.Property<int>("IdState")
-                        .HasColumnType("int");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CityId"));
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<int?>("StateIdState")
+                    b.Property<int>("StateId")
                         .HasColumnType("int");
 
-                    b.HasKey("IdCity");
+                    b.HasKey("CityId");
 
-                    b.HasIndex("StateIdState");
+                    b.HasIndex("StateId");
 
-                    b.HasIndex("Name", "IdState")
+                    b.HasIndex("Name", "StateId")
                         .IsUnique();
 
                     b.ToTable("Cities");
@@ -52,11 +49,11 @@ namespace Delab.Backend.Migrations
 
             modelBuilder.Entity("Delab.Shared.Entities.Country", b =>
                 {
-                    b.Property<int>("IdCountry")
+                    b.Property<int>("CountryId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdCountry"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CountryId"));
 
                     b.Property<string>("CodPhone")
                         .HasMaxLength(10)
@@ -67,7 +64,7 @@ namespace Delab.Backend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("IdCountry");
+                    b.HasKey("CountryId");
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -77,16 +74,13 @@ namespace Delab.Backend.Migrations
 
             modelBuilder.Entity("Delab.Shared.Entities.State", b =>
                 {
-                    b.Property<int>("IdState")
+                    b.Property<int>("StateId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdState"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StateId"));
 
-                    b.Property<int?>("CountryIdCountry")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdCountry")
+                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -94,11 +88,11 @@ namespace Delab.Backend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.HasKey("IdState");
+                    b.HasKey("StateId");
 
-                    b.HasIndex("CountryIdCountry");
+                    b.HasIndex("CountryId");
 
-                    b.HasIndex("Name", "IdCountry")
+                    b.HasIndex("Name", "CountryId")
                         .IsUnique();
 
                     b.ToTable("States");
@@ -108,8 +102,9 @@ namespace Delab.Backend.Migrations
                 {
                     b.HasOne("Delab.Shared.Entities.State", "State")
                         .WithMany("Cities")
-                        .HasForeignKey("StateIdState")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("StateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("State");
                 });
@@ -118,8 +113,9 @@ namespace Delab.Backend.Migrations
                 {
                     b.HasOne("Delab.Shared.Entities.Country", "Country")
                         .WithMany("States")
-                        .HasForeignKey("CountryIdCountry")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Country");
                 });

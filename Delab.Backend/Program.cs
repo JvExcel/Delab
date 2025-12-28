@@ -1,12 +1,15 @@
+using System.Text.Json.Serialization;
 using Delab.AccesData.Data;
+using Delab.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+// Para controlar las referencias ciclicas
+builder.Services.AddControllers()
+    .AddJsonOptions(x =>
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -39,12 +42,28 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+
+// Agregamos la clase semilla para que solo se use una sola vez
+builder.Services.AddTransient<SeedDb>();
 // Conexion a Base de Datos
 builder.Services.AddDbContext<DataContext>( x=>
 x.UseSqlServer("name=DefaultConnection", option => option.MigrationsAssembly("Delab.Backend")));
 
 
 var app = builder.Build();
+
+// Colocamos para que se ejecute el codigo de la clase semilla
+SeedData(app);
+void SeedData(WebApplication app)
+{
+    IServiceScopeFactory? scopedFactory = app.Services.GetService<IServiceScopeFactory>();
+    using (IServiceScope? scope = scopedFactory!.CreateScope())
+    {
+        SeedDb? service = scope.ServiceProvider.GetService<SeedDb>();
+        service!.SeedAsync().Wait();
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
