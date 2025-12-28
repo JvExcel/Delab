@@ -1,0 +1,23 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Delab.Shared.Entities;
+
+public class State
+{
+    [Key]
+    public int IdState { get; set; }
+
+    public int IdCountry { get; set; }
+
+    [Required(ErrorMessage = "El campo {0} es obligatorio")]
+    [MaxLength(100, ErrorMessage = "El campo {0} debe tener máximo {1} caracteres")]
+    [Display(Name = "Depart/Estado")]
+    public string Name { get; set; } = null!;
+
+
+    //Relacionnes
+    public Country? Country { get; set; }
+
+
+    public ICollection<City>? Cities { get; set; }
+}
